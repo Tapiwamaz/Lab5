@@ -2,6 +2,7 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 
+# 1 a)
 dist1X = np.random.normal(1,1,34)
 dist1Y = np.random.normal(-1,1,34)
 
@@ -21,6 +22,7 @@ dist1YTraining = dist1Y[:20]
 dist1XTest = dist1X[20:]
 dist1YTest = dist1Y[20:]
 
+# 1 a)
 dist2X = np.random.normal(-1,1,34)
 dist2Y = np.random.normal(1,1,34)
 
@@ -41,6 +43,7 @@ dist2XTest = dist2X[20:]
 dist2YTest = dist2Y[20:]
 
 theta = np.random.uniform(-0.5,0.5,3)
+
 
 def createLineCoords(parameters, inputs ):
     coords = np.array([])
@@ -67,7 +70,7 @@ def logisticFunction(parameters,coord):
     result = 1 / (1 + pow(math.e,-xValue) )
     return result
 
-print("Class of (0,5): ", round(logisticFunction(theta,np.array([1,0,5]))))
+# print("Class of (0,5): ", round(logisticFunction(theta,np.array([1,0,5]))))
 
 def error(parameters, dataPoints, classNumber):
     total = 0
@@ -75,16 +78,19 @@ def error(parameters, dataPoints, classNumber):
         total += classNumber * math.log10((logisticFunction(parameters,point))) + (1 -classNumber)* math.log10(1-logisticFunction(parameters,point))  
     return -total
 
-print("Error Dist1 Class 0: ",error(theta,dist1MatrixTraining,0))
-print("Error Dist1 Class 1: ",error(theta,dist1MatrixTraining,1))
-print("Error Dist2 Class 0: ",error(theta,dist2MatrixTraining,0))
-print("Error Dist2 Class 1: ",error(theta,dist2MatrixTraining,1))
+errDist1With0 = error(theta,dist1MatrixTraining,0)
+errDist1With1 = error(theta,dist1MatrixTraining,1)
+errDist2With0 = error(theta,dist2MatrixTraining,0)
+errDist2With1 = error(theta,dist2MatrixTraining,1)
+errorDist1 = error(theta,dist1MatrixTraining,0) + error(theta,dist1MatrixTraining,1)
+errorDist2 = error(theta,dist2MatrixTraining,1) +error(theta,dist2MatrixTraining,0)
 
-# Distribution 1 is class 0
-# Distribution 2 is class 1
+# print("Error Dist1: ",errorDist1)
+# print("Error Dist2: ",errorDist2)
 
 
-confusion = np.zeros((2,2))
+
+
 def confusionMatrix(parameters,dataPoints,classNumber,confusionMatrix):
     for point in dataPoints:
         prediction = round(logisticFunction(parameters,point))
@@ -93,8 +99,69 @@ def confusionMatrix(parameters,dataPoints,classNumber,confusionMatrix):
         else:
             confusionMatrix[prediction][classNumber] +=1
     return confusionMatrix
+confusion = np.zeros((2,2))
+# if errDist1With0 < errDist1With1:
+#     # dist 1 has class 0
+#     confusion = confusionMatrix(theta,dist1MatrixTraining,0,confusion)
+#     confusion = confusionMatrix(theta,dist2MatrixTraining,1,confusion)
+# else:
+#     confusion = confusionMatrix(theta,dist1MatrixTraining,1,confusion)
+#     confusion = confusionMatrix(theta,dist2MatrixTraining,0,confusion)
+# print(confusion)
+def sigmoid(predictions):
+    return 1 / (1 + np.exp(-predictions))
 
-confusion = confusionMatrix(theta,dist1MatrixTraining,0,confusion)
-confusion = confusionMatrix(theta,dist2MatrixTraining,1,confusion)
-print(confusion)
+def descent(parameters,dataPoints,alpha,classNumber):
+    linearPredictions = np.dot(dataPoints,parameters)
+    predictions = sigmoid(linearPredictions)
+    print(predictions)
+    N  = len(dataPoints)
+    X0,X1, X2 = dataPoints.T
+    dw = 1/N * np.dot([X1,X2], (predictions-classNumber))
+    print(dw)
+    
 
+# print(linearPredictions)
+descent(theta,dist1Matrix,0.01,0)
+
+# print("Theta before: ",theta)
+# print("Error Dist1: ",errorDist1)
+# print("Error Dist2: ",errorDist2)
+
+# decidingParameters =  descent(theta,dist1MatrixTraining,0.01,0)
+# decidingError = error(decidingParameters,dist1MatrixTraining,0) + error(decidingParameters,dist1MatrixTraining,1)
+
+# if errorDist1 > decidingError:
+#         # Dist 1 has classnumber 0
+#     for i in range(2):
+#         theta = descent(theta,dist1MatrixTraining,0.01,0)
+#     confusion = confusionMatrix(theta,dist1MatrixTraining,0,confusion) 
+#     confusion = confusionMatrix(theta,dist2MatrixTraining,1,confusion) 
+# else:
+#      # Dist 1 has classnumber 1  
+#     for i in range(2):
+#         theta = descent(theta,dist2MatrixTraining,0.01,0)  
+#     confusion = confusionMatrix(theta,dist1MatrixTraining,1,confusion) 
+#     confusion = confusionMatrix(theta,dist2MatrixTraining,0,confusion)   
+
+   
+# print("Theta after: ",theta)
+# errorDist1 = error(theta,dist1MatrixTraining,0) + error(theta,dist1MatrixTraining,1)
+# errorDist2 = error(theta,dist2MatrixTraining,1) +error(theta,dist2MatrixTraining,0)
+# print("Error Dist1: ",errorDist1)
+# print("Error Dist2: ",errorDist2)
+
+
+# confusion = np.zeros((2,2))
+# confusion = confusionMatrix(theta,dist1MatrixTraining,0,confusion)
+# confusion = confusionMatrix(theta,dist2MatrixTraining,1,confusion)
+# print(confusion)
+
+# plt.close()
+# graph = plt.scatter(dist1XTraining,dist1YTraining,color="black")
+# graph = plt.scatter(dist2XTraining,dist2YTraining,color="red")
+# out = createLineCoords(theta,arr)
+# graph = plt.plot(arr,out,marker="o")
+# plt.xlim(-5,5)
+# plt.ylim(-10,10)
+# plt.show()
